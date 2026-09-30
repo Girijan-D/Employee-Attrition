@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Attrition Prediction Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js local offline build -->
+  <script src="lib/chart.umd.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="nav-brand" onclick="document.querySelector('[data-view=dashboard]').click()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="dashboard">Dashboard</button>
+        <button class="nav-tab" data-view="predict">Predict</button>
+        <button class="nav-tab" data-view="analytics">Analytics</button>
+        <button class="nav-tab" data-view="model-performance">Model Performance</button>
+        <button class="nav-tab" data-view="monitoring">Monitoring</button>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="user-profile" id="user-profile">
+        <div class="user-avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span>admin</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <button class="logout-btn" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- Login Overlay -->
+  <div class="login-overlay hidden" id="login-overlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h2>Employee Attrition Portal</h2>
+        <p>Login to access analytics and ML prediction dashboard</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>Username</label>
+          <input type="text" id="login-username" class="form-control" value="admin" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-control" value="admin123" required>
+        </div>
+        <button type="submit" class="btn-primary">Sign In to Dashboard</button>
+      </form>
+      <div class="demo-credentials-badge">
+        <strong>Demo Account:</strong> admin / admin123
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- 1. DASHBOARD VIEW -->
+    <section id="dashboard-view" class="view-section">
+      <div class="section-header">
+        <div class="header-title-group">
+          <div class="header-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="header-text">
+            <h1>Employee Attrition Dashboard</h1>
+            <p>Key insights into employee attrition and workforce health</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <select>
+            <option>Last 12 Months</option>
+            <option>Last 6 Months</option>
+            <option>Last 30 Days</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stat Cards Grid -->
+      <div class="stat-cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Total Employees</div>
+            <div class="stat-value">1,473</div>
+            <div class="stat-sub up">↑ 2.5% from last month</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">At Risk</div>
+            <div class="stat-value">298</div>
+            <div class="stat-sub">20.2% of total</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Stable</div>
+            <div class="stat-value">1,175</div>
+            <div class="stat-sub">79.8% of total</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Attrition Rate</div>
+            <div class="stat-value">20.2%</div>
+            <div class="stat-sub down">↓ 1.8% from last month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="dashboard-charts-grid">
+        <div class="card">
+          <div class="card-title">Attrition Distribution</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-attrition-dist"></canvas>
+            <div class="donut-center-text">
+              <div class="val">20.2%</div>
+              <div class="lbl">Attrition Rate</div>
+            </div>
+          </div>
+          <div class="custom-legend">
+            <div class="legend-item"><span class="legend-dot" style="background-color:#2563EB"></span> Stayed 79.8%</div>
+            <div class="legend-item"><span class="legend-dot" style="background-color:#F97316"></span> Left 20.2%</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Attrition by Department</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-attrition-dept"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Monthly Attrition Trend</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-attrition-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Section -->
+      <div class="table-card">
+        <div class="card-title">Recent High-Risk Employees</div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Job Role</th>
+              <th>Risk Score</th>
+              <th>Joined On</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-risk-tbody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. PREDICT VIEW -->
+    <section id="predict-view" class="view-section hidden">
+      <div class="section-header">
+        <div class="header-title-group">
+          <div class="header-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="header-text">
+            <h1>Employee Attrition Prediction</h1>
+            <p>Enter employee parameters to evaluate attrition risk</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="predict-grid">
+        <!-- Input Form Card -->
+        <div class="card">
+          <div class="card-title">Employee Information Input</div>
+          <form id="attrition-predict-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Employee ID</label>
+                <input type="text" id="input-emp-id" class="form-control" value="E1045">
+              </div>
+
+              <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="input-age" class="form-control" value="32" min="18" max="70">
+              </div>
+
+              <div class="form-group">
+                <label>Department</label>
+                <select id="input-dept" class="form-control">
+                  <option value="IT" selected>IT</option>
+                  <option value="Sales">Sales</option>
+                  <option value="R&D">R&D</option>
+                  <option value="HR">HR</option>
+                  <option value="Finance">Finance</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Job Role</label>
+                <select id="input-role" class="form-control">
+                  <option value="Software Engineer" selected>Software Engineer</option>
+                  <option value="Sales Executive">Sales Executive</option>
+                  <option value="Research Scientist">Research Scientist</option>
+                  <option value="HR Executive">HR Executive</option>
+                  <option value="Analyst">Analyst</option>
+                  <option value="Manager">Manager</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Monthly Income (₹)</label>
+                <input type="number" id="input-income" class="form-control" value="60000" step="5000">
+              </div>
+
+              <div class="form-group">
+                <label>Overtime</label>
+                <select id="input-overtime" class="form-control">
+                  <option value="Yes" selected>Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Job Satisfaction (1 - 5)</label>
+                <select id="input-satisfaction" class="form-control">
+                  <option value="1">1 - Low</option>
+                  <option value="2">2 - Below Average</option>
+                  <option value="3" selected>3 - Moderate</option>
+                  <option value="4">4 - High</option>
+                  <option value="5">5 - Very High</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Work-Life Balance (1 - 5)</label>
+                <select id="input-wlb" class="form-control">
+                  <option value="1">1 - Poor</option>
+                  <option value="2">2 - Fair</option>
+                  <option value="3" selected>3 - Good</option>
+                  <option value="4">4 - Very Good</option>
+                  <option value="5">5 - Excellent</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label>Years at Company</label>
+                <input type="number" id="input-years" class="form-control" value="3" min="0" max="40">
+              </div>
+
+              <div class="form-group full-width">
+                <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m12 16 4-4-4-4"/><path d="M8 12h8"/></svg>
+                  Predict Attrition Risk
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Prediction Result Container (Matching Screenshot #4) -->
+        <div id="predict-result-container">
+          <div class="card">
+            <div class="card-title">
+              <span>Attrition Prediction Result</span>
+              <button id="btn-new-predict" style="background:none; border:none; color:var(--primary-blue); font-size:12px; cursor:pointer; font-weight:600;">Reset</button>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Based on your input, here is the prediction outcome</p>
+
+            <!-- Alert Header Banner -->
+            <div class="result-header-alert" id="res-alert-box">
+              <div class="alert-icon">!</div>
+              <div class="alert-content">
+                <h2 id="res-alert-title">High Risk</h2>
+                <p id="res-alert-desc">This employee is likely to leave the organization.</p>
+              </div>
+            </div>
+
+            <!-- Details & Donut Gauge Box -->
+            <div class="prediction-details-box">
+              <div class="gauge-container">
+                <div class="gauge-circle" id="res-gauge-circle">
+                  <div class="gauge-inner">
+                    <span class="gauge-val" id="res-gauge-val">78%</span>
+                    <span class="gauge-lbl">Probability of Attrition</span>
+                  </div>
+                </div>
+              </div>
+
+              <table class="summary-table">
+                <caption style="text-align:left; font-weight:700; color:var(--text-main); font-size:14px; margin-bottom:6px;">Employee Summary</caption>
+                <tr><td>Age</td><td id="res-sum-age">32</td></tr>
+                <tr><td>Job Role</td><td id="res-sum-role">Software Engineer</td></tr>
+                <tr><td>Monthly Income</td><td id="res-sum-income">₹60,000</td></tr>
+                <tr><td>Job Satisfaction</td><td id="res-sum-satisfaction">3/5</td></tr>
+                <tr><td>Years at Company</td><td id="res-sum-years">3 years</td></tr>
+                <tr><td>Overtime</td><td id="res-sum-overtime">Yes</td></tr>
+              </table>
+            </div>
+
+            <!-- Key Contributing Factors -->
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px;">Key Contributing Factors</div>
+              <div class="factors-list">
+                <div class="factor-item">
+                  <div class="factor-meta"><span>Overtime</span><span>32%</span></div>
+                  <div class="factor-bar-bg"><div class="factor-bar-fill" style="width: 32%; background: linear-gradient(90deg, #F87171, #EF4444);"></div></div>
+                </div>
+                <div class="factor-item">
+                  <div class="factor-meta"><span>Job Satisfaction</span><span>24%</span></div>
+                  <div class="factor-bar-bg"><div class="factor-bar-fill" style="width: 24%; background: linear-gradient(90deg, #FBBF24, #F59E0B);"></div></div>
+                </div>
+                <div class="factor-item">
+                  <div class="factor-meta"><span>Monthly Income</span><span>18%</span></div>
+                  <div class="factor-bar-bg"><div class="factor-bar-fill" style="width: 18%; background: linear-gradient(90deg, #FDE047, #EAB308);"></div></div>
+                </div>
+                <div class="factor-item">
+                  <div class="factor-meta"><span>Years at Company</span><span>14%</span></div>
+                  <div class="factor-bar-bg"><div class="factor-bar-fill" style="width: 14%; background: linear-gradient(90deg, #60A5FA, #2563EB);"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommended Retention Actions -->
+            <div class="recommendations-box">
+              <div class="rec-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                Recommended Retention Actions
+              </div>
+              <ul class="rec-list">
+                <li><span class="check">✓</span> Reduce overtime and improve work-life balance</li>
+                <li><span class="check">✓</span> Increase job satisfaction through growth opportunities</li>
+                <li><span class="check">✓</span> Review compensation and benefits</li>
+                <li><span class="check">✓</span> Provide mentoring and career development programs</li>
+              </ul>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 16px; display: flex; align-items: center; gap: 4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Prediction generated using Logistic Regression model (v1.0)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ANALYTICS VIEW -->
+    <section id="analytics-view" class="view-section hidden">
+      <div class="section-header">
+        <div class="header-title-group">
+          <div class="header-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="header-text">
+            <h1>Employee Analytics</h1>
+            <p>Explore workforce trends and attrition patterns</p>
+          </div>
+        </div>
+        <div class="analytics-filters">
+          <div class="analytics-filter-item">
+            <label>Department</label>
+            <select>
+              <option>All Departments</option>
+              <option>Sales</option>
+              <option>HR</option>
+              <option>R&D</option>
+              <option>IT</option>
+              <option>Finance</option>
+            </select>
+          </div>
+          <div class="analytics-filter-item">
+            <label>Job Role</label>
+            <select>
+              <option>All Roles</option>
+              <option>Software Engineer</option>
+              <option>Sales Executive</option>
+              <option>Research Scientist</option>
+            </select>
+          </div>
+          <div class="analytics-filter-item">
+            <label>Gender</label>
+            <select>
+              <option>All Genders</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Row: 3 Charts -->
+      <div class="analytics-grid">
+        <div class="card">
+          <div class="card-title">Attrition by Department</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-analytics-dept"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Attrition by Age Group</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-analytics-age"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Attrition by Job Satisfaction</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-analytics-satisfaction"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: 2 Charts -->
+      <div class="analytics-grid-bottom">
+        <div class="card">
+          <div class="card-title">Attrition by Overtime</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-analytics-overtime"></canvas>
+            <div class="donut-center-text">
+              <div class="val">30.8%</div>
+              <div class="lbl">Overtime</div>
+            </div>
+          </div>
+          <div class="custom-legend">
+            <div class="legend-item"><span class="legend-dot" style="background-color:#2563EB"></span> Yes 30.8%</div>
+            <div class="legend-item"><span class="legend-dot" style="background-color:#BFDBFE"></span> No 69.2%</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Attrition by Monthly Income</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-analytics-income"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MODEL PERFORMANCE VIEW -->
+    <section id="model-performance-view" class="view-section hidden">
+      <div class="section-header">
+        <div class="header-title-group">
+          <div class="header-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="header-text">
+            <h1>Model Performance</h1>
+            <p>Evaluation metrics and model insights</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="stat-cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Accuracy</div>
+            <div class="stat-value">86.05%</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Precision</div>
+            <div class="stat-value">0.82</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Recall</div>
+            <div class="stat-value">0.78</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">F1 Score</div>
+            <div class="stat-value">0.80</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px;">
+        <!-- Confusion Matrix -->
+        <div class="card">
+          <div class="card-title">Confusion Matrix</div>
+          <div class="confusion-matrix-box">
+            <div class="matrix-grid">
+              <div></div>
+              <div class="matrix-label">No Attrition</div>
+              <div class="matrix-label">Attrition</div>
+
+              <div class="matrix-label" style="writing-mode: vertical-rl; transform: rotate(180deg);">No Attrition</div>
+              <div class="matrix-cell cell-tn">227</div>
+              <div class="matrix-cell cell-fp">23</div>
+
+              <div class="matrix-label" style="writing-mode: vertical-rl; transform: rotate(180deg);">Attrition</div>
+              <div class="matrix-cell cell-fn">18</div>
+              <div class="matrix-cell cell-tp">26</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; width:100%; margin-top:12px; font-size:11px; color:var(--text-muted);">
+              <span>Actual vs Predicted</span>
+              <span>227 total</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Importance -->
+        <div class="card">
+          <div class="card-title">Feature Importance</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-feature-importance"></canvas>
+          </div>
+        </div>
+
+        <!-- Model Info Stack -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <div class="card-title" style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Model Information
+            </div>
+            <div class="model-info-list">
+              <div class="model-info-item"><span class="lbl">Model Name</span><span class="val">Logistic Regression</span></div>
+              <div class="model-info-item"><span class="lbl">Version</span><span class="val">v1.0</span></div>
+              <div class="model-info-item"><span class="lbl">Algorithm</span><span class="val">Logistic Regression</span></div>
+              <div class="model-info-item"><span class="lbl">Training Date</span><span class="val">2025-06-10</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m12 6 4 6h-8z"/></svg>
+              MLOps Status
+            </div>
+            <div class="model-info-list">
+              <div class="model-info-item"><span class="lbl">Status</span><span class="val" style="color:#16A34A;">🟢 Model Deployed</span></div>
+              <div class="model-info-item"><span class="lbl">Version</span><span class="val">v1.0</span></div>
+              <div class="model-info-item"><span class="lbl">Registered</span><span class="val">2025-06-10 14:32</span></div>
+              <div class="model-info-item"><span class="lbl">Environment</span><span class="val">Production</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. MONITORING VIEW -->
+    <section id="monitoring-view" class="view-section hidden">
+      <div class="section-header">
+        <div class="header-title-group">
+          <div class="header-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="header-text">
+            <h1>MLOps Monitoring</h1>
+            <p>Track model health, data quality and system performance</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="stat-cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Model Health</div>
+            <div class="stat-value" style="color:#16A34A;">Healthy</div>
+            <div class="stat-sub">All systems operational</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Prediction Volume</div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-sub up">Today's predictions ↑ 12%</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon red" style="background-color:#FEF3C7; color:#D97706;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Data Drift</div>
+            <div class="stat-value" style="color:#16A34A;">No Drift Detected</div>
+            <div class="stat-sub">Last check: 2h ago</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Data Quality</div>
+            <div class="stat-value">98.7%</div>
+            <div class="stat-sub">Valid data records</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Layout -->
+      <div class="monitoring-grid">
+        <!-- Logs Table -->
+        <div class="table-card">
+          <div class="card-title">Recent Prediction Logs</div>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Employee ID</th>
+                <th>Prediction</th>
+                <th>Probability</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="monitoring-logs-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Right Stack -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <div class="card-title" style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Model Information
+            </div>
+            <div class="model-info-list">
+              <div class="model-info-item"><span class="lbl">Version</span><span class="val">v1.0</span></div>
+              <div class="model-info-item"><span class="lbl">Last Retrained</span><span class="val">2025-06-05 09:30</span></div>
+              <div class="model-info-item"><span class="lbl">Next Retrain</span><span class="val">2025-07-05 09:30</span></div>
+            </div>
+          </div>
+
+          <div class="health-banner-card">
+            <div class="health-banner-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="health-banner-text">
+              <h3>Model Healthy</h3>
+              <p>Performance is within expected range</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
